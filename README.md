@@ -146,6 +146,7 @@ is-my-code-cursed main.py --brutal --max-words 500 --output report.txt
 | `--output FILE` | `-o` | Save the sage's verdict to a file |
 | `--brutal` | `-b` | No mercy mode — harsher roasting |
 | `--max-words N` | `-w` | Limit the response to N words |
+| `--verbose` | `-v` | Print status of when importing lib and calling Gemini API |
 | `--help` | `-h` | Show help message and exit |
 
 ---
@@ -163,6 +164,10 @@ is-my-code-cursed/
 ---
 
 ## 📝 Changelog
+
+### v1.0.1
+- 🧹 Small code cleanup
+- New flag: `--verbose` to print status when importing lib and calling API
 
 ### v1.0.0
 - 🎉 Initial release
