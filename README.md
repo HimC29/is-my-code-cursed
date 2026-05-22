@@ -72,7 +72,7 @@ cd is-my-code-cursed
 ### 2. Install dependencies
 
 ```bash
-pip install google-genai python-dotenv
+pip install google-genai
 ```
 
 ### 3. Get a Gemini API key
@@ -93,8 +93,8 @@ source ~/.zshrc  # or ~/.bashrc
 ### 4. Install the CLI command
 
 ```bash
-chmod +x add_to_path.sh
-./add_to_path.sh
+chmod +x install.sh
+./install.sh
 ```
 
 Now you can run `is-my-code-cursed` from anywhere!
@@ -156,14 +156,19 @@ is-my-code-cursed main.py --brutal --max-words 500 --output report.txt
 ```
 is-my-code-cursed/
 ├── src/
-│   └── main.py           — Main CLI script
-├── add_to_path.sh        — Installs the CLI command system-wide
-└── README.md             — Project documentation
+│   └── main.py          — Main CLI script
+├── install.sh            — Installs the CLI command system-wide
+├── README.md             — Project documentation
+└── LICENSE               — MIT license
 ```
 
 ---
 
 ## 📝 Changelog
+
+### v1.0.2
+- 💻 Rename add_to_path.sh to install.sh
+- Improve install.sh to support Termux and have more fallback features
 
 ### v1.0.1
 - 🧹 Small code cleanup
