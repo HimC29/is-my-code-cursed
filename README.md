@@ -166,6 +166,12 @@ is-my-code-cursed/
 
 ## 📝 Changelog
 
+### v1.0.3
+- 📁 Add directory support — analyze entire projects recursively
+- 🚫 Automatically skip binary files
+- 🧹 Ignore common dependency/cache folders like `.git` and `node_modules`
+- 📄 Include file names and contents in AI analysis context
+
 ### v1.0.2
 - 💻 Rename add_to_path.sh to install.sh
 - Improve install.sh to support Termux and have more fallback features

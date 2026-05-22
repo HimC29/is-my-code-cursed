@@ -10,6 +10,48 @@ BRUTAL_PROMPT = "You are a merciless ancient code sage with no patience for medi
 GEMINI_MODEL = "gemini-2.5-flash"
 API_KEY = os.getenv("GEMINI_API_KEY")
 
+IGNORED_DIRS = {
+    ".git",
+    "node_modules",
+    "__pycache__",
+    ".venv",
+    "venv"
+}
+
+# check if a file is binary or text
+def is_binary_file(file, chunk_size=1024):
+    try:
+        chunk = file.read(chunk_size)
+
+        if b"\x00" in chunk:
+            return True
+
+        chunk.decode("utf-8")
+
+        return False
+
+    except UnicodeDecodeError:
+        return True
+
+# iterate text files
+def iter_text_files(target):
+    for dirpath, dirnames, filenames in os.walk(target):
+        dirnames[:] = [
+            d for d in dirnames
+            if d not in IGNORED_DIRS
+        ]
+
+        for filename in filenames:
+            path = os.path.join(dirpath, filename)
+
+            try:
+                with open(path, "rb") as f:
+                    if not is_binary_file(f):
+                        yield path
+
+            except Exception:
+                continue
+
 # function for printing and exiting
 def error_exit(string, code):
     print("is-my-code-cursed: error: " + string)
@@ -47,36 +89,40 @@ def main():
     if not API_KEY:
         error_exit("GEMINI_API_KEY not set. run 'export GEMINI_API_KEY=\"<your_key>\"'", 1)
 
+    code = ""
+
     if os.path.isdir(target):
-        error_exit("directories are not supported", 1)
+        for path in iter_text_files(target):
+            with open(path, "r") as f:
+                code += f"File: {path}\n{f.read()}"
+    else:
+        try:
+            with open(target, "r") as f:
+                code = f.read()
+        except FileNotFoundError:
+            error_exit("file not found", 1)
 
+    # ONLY import here because genai is a huge lib
+    # takes forever to load so things like --help take forever
+    print_verbose(verbose, "loading Google genai lib")
+    from google import genai
+    client = genai.Client(api_key=API_KEY)
     try:
-        with open(target, "r") as f:
-            code = f.read()
+        prompt = SYSTEM_PROMPT
+        if args.brutal:
+            prompt = BRUTAL_PROMPT
+        if max_words:
+            prompt += f" Keep your response under {max_words} words."
+        print_verbose(verbose, "Calling Gemini API\n")
+        response = ask_gemini(client, code, prompt)
+    except Exception as e:
+        error_exit(f"Gemini API failed - {e}", 1)
 
-            # ONLY import here because genai is a huge lib
-            # takes forever to load so things like --help take forever
-            print_verbose(verbose, "loading Google genai lib")
-            from google import genai
-            client = genai.Client(api_key=API_KEY)
-            try:
-                prompt = SYSTEM_PROMPT
-                if args.brutal:
-                    prompt = BRUTAL_PROMPT
-                if max_words:
-                    prompt += f" Keep your response under {max_words} words."
-                print_verbose(verbose, "Calling Gemini API\n")
-                response = ask_gemini(client, code, prompt)
-            except Exception as e:
-                error_exit(f"Gemini API failed - {e}", 1)
+    print(response)
 
-            print(response)
-
-            if output:
-                with open(output, "w") as out:
-                    out.write(response)
-    except FileNotFoundError:
-        error_exit("file not found", 1)
+    if output:
+        with open(output, "w") as out:
+            out.write(response)
 
 if __name__ == "__main__":
     main()
