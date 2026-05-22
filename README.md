@@ -166,6 +166,9 @@ is-my-code-cursed/
 
 ## 📝 Changelog
 
+### v1.0.4
+- 💻 Add auto permission elevation for Linux installs in install.sh if needed
+
 ### v1.0.3
 - 📁 Add directory support — analyze entire projects recursively
 - 🚫 Automatically skip binary files

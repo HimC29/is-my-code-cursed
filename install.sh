@@ -1,19 +1,30 @@
 #!/bin/bash
 
-# change directory to where this .sh script lives
+# Change directory to where this .sh script lives
 cd "$(dirname "$0")"
 
-# set the target prefix (Defaults to / on Linux, keeps Termux path)
-TARGET_PREFIX="${PREFIX:-/}"
+# Set the target prefix (Defaults to empty, keeps Termux path if present)
+TARGET_PREFIX="${PREFIX:-}"
 
-# define the destination binary directory
-BIN_DIR="$TARGET_PREFIX/bin"
+# Define the destination binary directory (Defaults to /bin if TARGET_PREFIX is empty)
+BIN_DIR="${TARGET_PREFIX}/bin"
+[ -z "$TARGET_PREFIX" ] && BIN_DIR="/bin"
 
-# create the directory if it does not exist
+# Automatically prompt for sudo if not root and not in Termux
+if [ -z "$PREFIX" ] && [ "$EUID" -ne 0 ]; then
+    echo "This installation requires root privileges. Elevating..."
+    exec sudo "$0" "$@"
+fi
+
+# Create the directory if it does not exist
 mkdir -p "$BIN_DIR"
 
-# install and set permissions
-cp src/main.py "$BIN_DIR/is-my-code-cursed"
-chmod 755 "$BIN_DIR/is-my-code-cursed"
+# Install and set permissions (Only run if cp succeeds)
+if cp src/main.py "$BIN_DIR/is-my-code-cursed"; then
+    chmod 755 "$BIN_DIR/is-my-code-cursed"
+    echo "Successfully installed to $BIN_DIR/is-my-code-cursed"
+else
+    echo "Installation failed!" >&2
+    exit 1
+fi
 
-echo "Successfully installed to $BIN_DIR/is-my-code-cursed"
