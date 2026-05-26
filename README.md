@@ -147,6 +147,7 @@ is-my-code-cursed main.py --brutal --max-words 500 --output report.txt
 | `--brutal` | `-b` | No mercy mode — harsher roasting |
 | `--max-words N` | `-w` | Limit the response to N words |
 | `--verbose` | `-v` | Print status of when importing lib and calling Gemini API |
+| `--exclude DIRS` | `-e` | Comma-separated directories to ignore |
 | `--help` | `-h` | Show help message and exit |
 
 ---
@@ -165,6 +166,10 @@ is-my-code-cursed/
 ---
 
 ## 📝 Changelog
+
+### v1.0.4
+- 🚫 New `--exclude` / `-e` flag to ignore custom directories
+- 🧹 Support multiple excluded folders using comma-separated values
 
 ### v1.0.3
 - 📁 Add directory support — analyze entire projects recursively
@@ -226,7 +231,6 @@ Contributions are welcome! If you have ideas for new flags, better prompts, or b
 ### Ideas for Contributions
 
 - 🎨 Colored terminal output with `colorama` or `rich`
-- 📁 Directory support — analyze all files in a folder
 - 🔔 Support for more languages/models
 - 📦 PyPI package release
 

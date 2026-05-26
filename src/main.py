@@ -10,7 +10,7 @@ BRUTAL_PROMPT = "You are a merciless ancient code sage with no patience for medi
 GEMINI_MODEL = "gemini-2.5-flash"
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-IGNORED_DIRS = {
+ignored_dirs = {
     ".git",
     "node_modules",
     "__pycache__",
@@ -38,7 +38,7 @@ def iter_text_files(target):
     for dirpath, dirnames, filenames in os.walk(target):
         dirnames[:] = [
             d for d in dirnames
-            if d not in IGNORED_DIRS
+            if d not in ignored_dirs
         ]
 
         for filename in filenames:
@@ -79,12 +79,17 @@ def main():
     parser.add_argument("--output", "-o", help="Save report to file")
     parser.add_argument("--max-words", "-w", type=int, help="Max words in response")
     parser.add_argument("--verbose", "-v", action="store_true", help="Print status when importing lib and calling API")
+    parser.add_argument("--exclude", "-e", help="Comma-seperated directories to ignore")
 
     args = parser.parse_args()
     target = args.file
     output = args.output
     max_words = args.max_words
     verbose = args.verbose
+    excludes = args.exclude.split(",") if args.exclude else []
+
+    for exclude in excludes:
+        ignored_dirs.add(exclude)
 
     if not API_KEY:
         error_exit("GEMINI_API_KEY not set. run 'export GEMINI_API_KEY=\"<your_key>\"'", 1)
