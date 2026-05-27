@@ -37,8 +37,8 @@ Export the sage's verdict to a file for future reference
 📏 **Word Limit**  
 Control how long the sage's rant is with a word limit flag
 
-⚡ **Fast Startup**  
-Lazy imports mean `--help` and errors show instantly
+📁 **Directory Support**  
+Analyze entire projects recursively, skipping binary files automatically
 
 🛡️ **Proper Error Handling**  
 Clear error messages for missing API keys, files, and API failures
@@ -62,20 +62,26 @@ Ever stared at your own code and wondered if it's actually cursed? Now you can g
 
 ## 🚀 Installation
 
-### 1. Clone the repository
+### Option 1: AUR (Arch Linux)
+
+If you're on Arch Linux or an Arch-based distro, install directly via your AUR helper:
+
+```bash
+yay -S is-my-code-cursed
+```
+
+No dependencies to install manually — just set your API key and you're good to go.
+
+### Option 2: Manual
+
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/HimC29/is-my-code-cursed.git
 cd is-my-code-cursed
 ```
 
-### 2. Install dependencies
-
-```bash
-pip install google-genai
-```
-
-### 3. Get a Gemini API key
+#### 2. Get a Gemini API key
 
 Get a free API key from [aistudio.google.com](https://aistudio.google.com) and add it to your shell config:
 
@@ -90,7 +96,7 @@ Then reload your shell:
 source ~/.zshrc  # or ~/.bashrc
 ```
 
-### 4. Install the CLI command
+#### 3. Install the CLI command
 
 ```bash
 chmod +x install.sh
@@ -104,13 +110,19 @@ Now you can run `is-my-code-cursed` from anywhere!
 ## 📖 Usage
 
 ```bash
-is-my-code-cursed <file> [flags]
+is-my-code-cursed <file|directory> [flags]
 ```
 
 ### Basic example
 
 ```bash
 is-my-code-cursed main.py
+```
+
+### Analyze an entire project
+
+```bash
+is-my-code-cursed ./my-project
 ```
 
 ### Save the verdict to a file
@@ -131,6 +143,12 @@ is-my-code-cursed main.py --brutal
 is-my-code-cursed main.py --max-words 300
 ```
 
+### Exclude directories
+
+```bash
+is-my-code-cursed ./my-project --exclude dist,build
+```
+
 ### Combine flags
 
 ```bash
@@ -146,7 +164,7 @@ is-my-code-cursed main.py --brutal --max-words 500 --output report.txt
 | `--output FILE` | `-o` | Save the sage's verdict to a file |
 | `--brutal` | `-b` | No mercy mode — harsher roasting |
 | `--max-words N` | `-w` | Limit the response to N words |
-| `--verbose` | `-v` | Print status of when importing lib and calling Gemini API |
+| `--verbose` | `-v` | Print status when calling the Gemini API |
 | `--exclude DIRS` | `-e` | Comma-separated directories to ignore |
 | `--help` | `-h` | Show help message and exit |
 
@@ -166,6 +184,15 @@ is-my-code-cursed/
 ---
 
 ## 📝 Changelog
+
+### v1.1.0
+- 🔧 Removed `python-google-generativeai` dependency — now uses only Python stdlib
+- 📡 Gemini API calls now made directly via `urllib.request`
+- ⚠️ Improved warning message when a file is skipped during directory scan
+- 📦 Much easier to install — no AUR dependencies required
+
+> From this version onwards, this project follows [Semantic Versioning](https://semver.org/):
+> `MAJOR.MINOR.PATCH` — breaking changes . new features . bug fixes
 
 ### v1.0.5
 - 💻 Add auto permission elevation for Linux installs in install.sh if needed

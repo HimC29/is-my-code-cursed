@@ -3,6 +3,9 @@
 import sys
 import os
 import argparse
+import json
+import urllib.request
+import urllib.error
 
 # constants
 SYSTEM_PROMPT = "You are an ancient code sage. Analyze this code for cursedness — bad naming, spaghetti logic, magic numbers, crimes against readability. Give it a curse rating from 1-10 with a dramatic verdict and specific callouts."
@@ -49,7 +52,8 @@ def iter_text_files(target):
                     if not is_binary_file(f):
                         yield path
 
-            except Exception:
+            except Exception as e:
+                print(f"is-my-code-cursed: warning: skipping {path} - {e}")
                 continue
 
 # function for printing and exiting
@@ -62,15 +66,42 @@ def print_verbose(verbose, string):
         print(string)
 
 # function to ask gemini about the code
-def ask_gemini(client, code, prompt):
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=code,
-        config={
-            "system_instruction": prompt
-        }
+def ask_gemini(code, prompt, verbose):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={API_KEY}"
+
+    payload = json.dumps({
+        "system_instruction": {
+            "parts": [{"text": prompt}]
+        },
+        "contents": [
+            {
+                "parts": [{"text": code}]
+            }
+        ]
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST"
     )
-    return response.text
+
+    print_verbose(verbose, "Calling Gemini API\n")
+
+    try:
+        with urllib.request.urlopen(req) as res:
+            data = json.loads(res.read().decode("utf-8"))
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8")
+        try:
+            msg = json.loads(body)["error"]["message"]
+        except Exception:
+            msg = body
+        error_exit(f"Gemini API failed - {msg}", 1)
+    except Exception as e:
+        error_exit(f"Gemini API failed - {e}", 1)
 
 def main():
     parser = argparse.ArgumentParser(description="Is my code cursed?")
@@ -78,8 +109,8 @@ def main():
     parser.add_argument("--brutal", "-b", action="store_true", help="No mercy mode - harsher roasting")
     parser.add_argument("--output", "-o", help="Save report to file")
     parser.add_argument("--max-words", "-w", type=int, help="Max words in response")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Print status when importing lib and calling API")
-    parser.add_argument("--exclude", "-e", help="Comma-seperated directories to ignore")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Print status when calling API")
+    parser.add_argument("--exclude", "-e", help="Comma-separated directories to ignore")
 
     args = parser.parse_args()
     target = args.file
@@ -107,21 +138,13 @@ def main():
         except FileNotFoundError:
             error_exit("file not found", 1)
 
-    # ONLY import here because genai is a huge lib
-    # takes forever to load so things like --help take forever
-    print_verbose(verbose, "loading Google genai lib")
-    from google import genai
-    client = genai.Client(api_key=API_KEY)
-    try:
-        prompt = SYSTEM_PROMPT
-        if args.brutal:
-            prompt = BRUTAL_PROMPT
-        if max_words:
-            prompt += f" Keep your response under {max_words} words."
-        print_verbose(verbose, "Calling Gemini API\n")
-        response = ask_gemini(client, code, prompt)
-    except Exception as e:
-        error_exit(f"Gemini API failed - {e}", 1)
+    prompt = SYSTEM_PROMPT
+    if args.brutal:
+        prompt = BRUTAL_PROMPT
+    if max_words:
+        prompt += f" Keep your response under {max_words} words."
+
+    response = ask_gemini(code, prompt, verbose)
 
     print(response)
 
