@@ -167,6 +167,9 @@ is-my-code-cursed/
 
 ## 📝 Changelog
 
+### v1.0.5
+- 💻 Add auto permission elevation for Linux installs in install.sh if needed
+
 ### v1.0.4
 - 🚫 New `--exclude` / `-e` flag to ignore custom directories
 - 🧹 Support multiple excluded folders using comma-separated values
