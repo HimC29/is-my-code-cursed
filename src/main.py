@@ -8,6 +8,7 @@ import urllib.request
 import urllib.error
 
 # constants
+VERSION = "1.2.0"
 SYSTEM_PROMPT = "You are an ancient code sage. Analyze this code for cursedness — bad naming, spaghetti logic, magic numbers, crimes against readability. Give it a curse rating from 1-10 with a dramatic verdict and specific callouts."
 BRUTAL_PROMPT = "You are a merciless ancient code sage with no patience for mediocrity. Tear this code apart. Find every flaw, no matter how small. Be dramatic, be harsh, be unforgiving. Give it a curse rating from 1-10."
 GEMINI_MODEL = "gemini-2.5-flash"
@@ -105,6 +106,7 @@ def ask_gemini(code, prompt, verbose):
 
 def main():
     parser = argparse.ArgumentParser(description="Is my code cursed?")
+    parser.add_argument("--version", action="version", version=f"is-my-code-cursed {VERSION}")
     parser.add_argument("file", help="File to analyze")
     parser.add_argument("--brutal", "-b", action="store_true", help="No mercy mode - harsher roasting")
     parser.add_argument("--output", "-o", help="Save report to file")

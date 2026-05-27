@@ -166,6 +166,7 @@ is-my-code-cursed main.py --brutal --max-words 500 --output report.txt
 | `--max-words N` | `-w` | Limit the response to N words |
 | `--verbose` | `-v` | Print status when calling the Gemini API |
 | `--exclude DIRS` | `-e` | Comma-separated directories to ignore |
+| `--version` | | Print the version and exit |
 | `--help` | `-h` | Show help message and exit |
 
 ---
@@ -184,6 +185,9 @@ is-my-code-cursed/
 ---
 
 ## 📝 Changelog
+
+### v1.2.0
+- 🏷️ Add `--version` flag to print the current version
 
 ### v1.1.0
 - 🔧 Removed `python-google-generativeai` dependency — now uses only Python stdlib
